@@ -33,15 +33,33 @@ const DeployPanel = ({ nodes, edges }: DeployPanelProps) => {
     vpn: { protocol: "L2TP", auto_setup: true },
   };
 
-  const handleDeploy = () => {
+  const API_URL = "http://77.110.123.57:8000";
+
+  const handleDeploy = async () => {
     if (mikrotikNodes.length === 0) {
       toast.error("Agrega al menos un MikroTik al lienzo");
       return;
     }
-    setDeployed(true);
-    toast.success("Topología enviada al backend para despliegue", {
-      description: `${mikrotikNodes.length} routers, ${clientNodes.length} clientes`,
-    });
+    try {
+      toast.loading("Desplegando laboratorio...", { id: "deploy" });
+      const res = await fetch(`${API_URL}/api/deploy`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(topology),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || "Error en el despliegue");
+      }
+      const data = await res.json();
+      setDeployed(true);
+      toast.success("¡Laboratorio desplegado!", {
+        id: "deploy",
+        description: `${data.containers?.length} contenedores creados`,
+      });
+    } catch (e: any) {
+      toast.error(e.message || "Error al conectar con el backend", { id: "deploy" });
+    }
   };
 
   const handleCopy = () => {
