@@ -1,16 +1,27 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState, useCallback } from "react";
+import type { Node, Edge } from "@xyflow/react";
+import Sidebar from "@/components/Sidebar";
+import TopologyCanvas from "@/components/TopologyCanvas";
+import DeployPanel from "@/components/DeployPanel";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Index = () => {
+  const [nodes, setNodes] = useState<Node[]>([]);
+  const [edges, setEdges] = useState<Edge[]>([]);
+
+  const handleTopologyChange = useCallback((newNodes: Node[], newEdges: Edge[]) => {
+    setNodes(newNodes);
+    setEdges(newEdges);
+  }, []);
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="flex h-screen w-screen overflow-hidden">
+      <Sidebar />
+      <main className="flex-1">
+        <TopologyCanvas onTopologyChange={handleTopologyChange} />
+      </main>
+      <DeployPanel nodes={nodes} edges={edges} />
     </div>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
